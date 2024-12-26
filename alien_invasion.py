@@ -2,6 +2,7 @@ import sys
 import pygame
 from settings import Settings
 from ship import Ship
+from bullet import Bullet
 
 class AlienInvasion:
     """Overall class to manage game assets and behaviour"""
@@ -17,6 +18,7 @@ class AlienInvasion:
         pygame.display.set_caption("Alien Invasion")
 
         self.ship = Ship(self)
+        self.bullets = pygame.sprite.Group()
 
 
     def run_game(self):
@@ -25,14 +27,18 @@ class AlienInvasion:
             # Watch for keyboard and mouse events
             self._check_events()
 
+            # Update the ship movement
+            self.ship.update()
+
+            # Update the bullet movement
+            self.bullets.update()
+
             # Redraw the screen during each pass to give the color
             self._update_screen()
 
             # Set the internal game clock
             self.clock.tick(60)
 
-            # Update the ship movement
-            self.ship.update()
 
     def _check_events(self):
             for event in pygame.event.get():
@@ -51,6 +57,11 @@ class AlienInvasion:
             self.ship.moving_right = True
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True
+        if event.key == pygame.K_UP:
+            self.ship.moving_up = True
+        elif event.key == pygame.K_DOWN:
+            self.ship.moving_down = True
+
         # QUIT THE GAME
         if event.key == pygame.K_q:
             sys.exit()
@@ -60,6 +71,10 @@ class AlienInvasion:
             self.ship.moving_right = False
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
+        if event.key == pygame.K_UP:
+            self.ship.moving_up = False
+        elif event.key == pygame.K_DOWN:
+            self.ship.moving_down = False
 
     def _update_screen(self):
         """Update the images on the screen, and flip to the new screen"""
@@ -72,4 +87,4 @@ class AlienInvasion:
 if __name__ == '__main__':
     # Make a game instance, and run the game
     ai = AlienInvasion()
-    ai.run_game()            
+    ai.run_game()
