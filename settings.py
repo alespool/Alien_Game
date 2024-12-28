@@ -17,3 +17,7 @@ class Settings:
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = (60,60,60)
+
+        # TODO: Check speed with time
+        # self.framerate = 60
+        # self.deltatime = 1/self.framerate
