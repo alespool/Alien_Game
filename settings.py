@@ -13,10 +13,15 @@ class Settings:
         self.ship_speed = 25.0
 
         # Bullet settings
-        self.bullet_speed = 15.0
+        self.bullet_speed = 25.0
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = (60,60,60)
+
+        # Alien settings 
+        self.alien_speed = 15.0
+        self.fleet_drop_speed = 10
+        self.fleet_direction = 1 # 1 is right, -1 is left
 
         # TODO: Check speed with time
         # self.framerate = 60
