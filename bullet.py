@@ -1,6 +1,5 @@
 import pygame
 from pygame.sprite import Sprite
-import time
 
 class Bullet(Sprite):
     """A class to manage bullets fired from the ship"""
@@ -18,7 +17,7 @@ class Bullet(Sprite):
 
         # Store the bullet's position as a float
         self.y = float(self.rect.y)
-        
+
     def update(self, delta_time):
         """Move the bullet up the screen"""
         # Update the position of the bullet

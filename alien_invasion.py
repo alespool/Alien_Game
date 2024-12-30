@@ -3,6 +3,8 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
+
 
 class AlienInvasion:
     """Overall class to manage game assets and behaviour"""
@@ -19,6 +21,9 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+
+        self._create_fleet()
 
 
     def run_game(self):
@@ -81,6 +86,29 @@ class AlienInvasion:
         elif event.key == pygame.K_DOWN:
             self.ship.moving_down = False
 
+    def _create_fleet(self):
+        """Create the fleet of alien ships."""
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+
+        current_x,current_y = alien_width * 0.5, alien_height
+        while current_y < (self.settings.screen_height -3 * alien_height):
+            while current_x < (self.settings.screen_width - 2 * alien_width):
+                self._create_alien(current_x, current_y)
+                current_x += 2 * alien_width * 0.5
+
+            # Write another row
+            current_x = alien_width
+            current_y += 2 * alien_height
+
+    def _create_alien(self, x_position, y_position):
+        """Create a new alien at the defined x position in the row."""
+        new_alien = Alien(self)
+        new_alien.x = x_position
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        self.aliens.add(new_alien)
+
     def _update_screen(self):
         """Update the images on the screen, and flip to the new screen"""
         self.screen.fill(self.settings.bg_color)
@@ -89,6 +117,7 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.ship.blitme()
+        self.aliens.draw(self.screen)
 
         # Make the most recently drawn screen visible
         pygame.display.flip()
@@ -101,13 +130,33 @@ class AlienInvasion:
     def _update_bullets(self, delta_time):
         """Update position of bullets and get rid of old bullets."""
         self.bullets.update(delta_time)
-        
+
         # Get rid of bullets outside windows
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+
+
 if __name__ == '__main__':
     # Make a game instance, and run the game
     ai = AlienInvasion()
     ai.run_game()
+
+
+
+    # def _create_fleet(self):
+    #     """Create the fleet of alien ships that we need to destroy."""
+    #     alien = Alien(self)
+    #     alien_width = alien.rect.width
+    #     total_space = self.settings.screen_width - 2 * alien_width
+
+    #     spacing = (total_space - (25 * alien_width)) / 24  # 25 aliens, 24 gaps
+
+    #     current_x = alien_width
+    #     for _ in range(25):
+    #         new_alien = Alien(self)
+    #         new_alien.x = current_x
+    #         new_alien.rect.x = current_x
+    #         self.aliens.add(new_alien)
+    #         current_x += alien_width + spacing
