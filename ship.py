@@ -31,20 +31,17 @@ class Ship:
         """Draw the ship at its current location"""
         self.screen.blit(self.image, self.rect)
 
-    def update(self):
+    def update(self, delta_time):
         """Update the ship's position based on the movement flag"""
         if self.moving_right == True and self.rect.right < self.screen_rect.right:
-            self.x += self.settings.ship_speed
+            self.x += self.settings.ship_speed * delta_time
         if self.moving_left == True and self.rect.left > 0:
-            self.x -= self.settings.ship_speed
+            self.x -= self.settings.ship_speed * delta_time
         if self.moving_up == True and self.rect.top > 0:
-            print(self.rect.top)
-            self.y -= self.settings.ship_speed
+            self.y -= self.settings.ship_speed * delta_time
         if self.moving_down == True and self.rect.bottom <= self.screen_rect.height:
-            print(self.rect.bottom, self.screen_rect.height)
-            self.y += self.settings.ship_speed
+            self.y += self.settings.ship_speed * delta_time
 
         # Update the rect object from self.x
         self.rect.x = self.x
         self.rect.y = self.y
-        # print(f"X : {self.rect.x} ; Y: {self.rect.y}")

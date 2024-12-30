@@ -27,11 +27,14 @@ class AlienInvasion:
             # Watch for keyboard and mouse events
             self._check_events()
 
-            # Update the ship movement
-            self.ship.update()
+            # Calculate time passed between frames (delta_time)
+            delta_time = self.clock.get_time() / 100  # Time in seconds
 
-            # Update the bullet movement
-            self.bullets.update()
+            # Update the ship movement with delta_time
+            self.ship.update(delta_time)
+
+            # Update the bullet movement with delta_time
+            self._update_bullets(delta_time)
 
             # Redraw the screen during each pass to give the color
             self._update_screen()
@@ -61,6 +64,8 @@ class AlienInvasion:
             self.ship.moving_up = True
         elif event.key == pygame.K_DOWN:
             self.ship.moving_down = True
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()        
 
         # QUIT THE GAME
         if event.key == pygame.K_q:
@@ -79,10 +84,28 @@ class AlienInvasion:
     def _update_screen(self):
         """Update the images on the screen, and flip to the new screen"""
         self.screen.fill(self.settings.bg_color)
+
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
         self.ship.blitme()
 
         # Make the most recently drawn screen visible
         pygame.display.flip()
+
+    def _fire_bullet(self):
+        """Create a new bullet and add it to the bullets group."""
+        new_bullet = Bullet(self)
+        self.bullets.add(new_bullet)
+        
+    def _update_bullets(self, delta_time):
+        """Update position of bullets and get rid of old bullets."""
+        self.bullets.update(delta_time)
+        
+        # Get rid of bullets outside windows
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
 
 if __name__ == '__main__':
     # Make a game instance, and run the game
