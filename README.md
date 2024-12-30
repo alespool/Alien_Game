@@ -5,3 +5,7 @@ The player can move the ship right and left using the arrow keys and shoot bulle
 When the game begins, a fleet of aliens fills the sky and moves across and down the screen. The player shoots and destroys the aliens. If the player destroys all the aliens, a new fleet appears that moves faster than the previous fleet. 
 
 If any alien hits the player’s ship or reaches the bottom of the screen, the player loses a ship. If the player loses three ships, the game ends.
+
+Game Demo:
+
+![game outlook](./images/game_demo.png)
