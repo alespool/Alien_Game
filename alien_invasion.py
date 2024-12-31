@@ -6,6 +6,7 @@ from bullet import Bullet
 from alien import Alien
 from time import sleep
 from game_stats import GameStats
+from buttons import Button
 
 class AlienInvasion:
     """Overall class to manage game assets and behaviour"""
@@ -17,7 +18,8 @@ class AlienInvasion:
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
-        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
 
         # Create an instance to store the stats
@@ -29,9 +31,10 @@ class AlienInvasion:
 
         self._create_fleet()
 
-        # Start the game on active state
-        self.game_active = True
+        self.play_buttons = self._create_buttons()
 
+        # Start the game on active state
+        self.game_active = False
 
     def run_game(self):
         """Start the main game loop"""
@@ -41,7 +44,7 @@ class AlienInvasion:
 
             # Calculate time passed between frames (delta_time)
             delta_time = self.clock.get_time() / 100  # Time in seconds
-
+            
             if self.game_active:
                 self.ship.update(delta_time)
                 self._update_bullets(delta_time)
@@ -54,18 +57,22 @@ class AlienInvasion:
 
 
     def _check_events(self):
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
+        """Check for events or letters typed."""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
 
-                # Move the ship
-                if event.type == pygame.KEYDOWN:
-                    self._check_keydown_events(event)
-                elif event.type == pygame.KEYUP:
-                    self._check_keyup_events(event)
-
+            if event.type == pygame.KEYDOWN:
+                self._check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
 
     def _check_keydown_events(self, event):
+        """Respond to key presses."""
+        # Move the ship
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = True
         elif event.key == pygame.K_LEFT:
@@ -76,6 +83,10 @@ class AlienInvasion:
             self.ship.moving_down = True
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()        
+
+        # Start the game with P
+        elif event.key == pygame.K_p and not self.game_active:
+            self._start_game()
 
         # QUIT THE GAME
         if event.key == pygame.K_q:
@@ -129,7 +140,7 @@ class AlienInvasion:
 
     def _update_screen(self):
         """Update the images on the screen, and flip to the new screen"""
-        self.screen.fill(self.settings.bg_color)
+        self.screen.blit(self.settings.bg_image, (0, 0))  # Draw the background image
 
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
@@ -137,8 +148,13 @@ class AlienInvasion:
         self.ship.blitme()
         self.aliens.draw(self.screen)
 
-        # Make the most recently drawn screen visible
+        if not self.game_active:
+            # Create buttons
+            for button in self.play_buttons:
+                button.draw_button()
+
         pygame.display.flip()
+
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
@@ -160,13 +176,14 @@ class AlienInvasion:
         """Respond to bullet-alien collisions."""
         # If bullets hit the alien do collision
         collision = pygame.sprite.groupcollide(
-                self.bullets, self.aliens, False, True # True means it will remove the sprite from the group
+                self.bullets, self.aliens, True, True # True means it will remove the sprite from the group
         )
 
         # If no more aliens, recreate the fleet
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
     def _update_aliens(self, delta_time):
         """Update the alien fleet position."""
@@ -194,6 +211,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.game_active = False
+            pygame.mouse.set_visible(True)
 
     def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""
@@ -202,6 +220,47 @@ class AlienInvasion:
                 # Treat this same as if the ship got hit
                 self._ship_hit()
                 break
+
+    def _check_play_button(self, mouse_pos):
+        """Start a new game when the player clicks Play."""
+        for button in self.play_buttons:
+            if button.rect.collidepoint(mouse_pos) and not self.game_active:
+                if button._button_msg == "SCORES":
+                    pass
+                elif button._button_msg == "Easy":
+                    self.settings.set_difficulty("Easy")
+                elif button._button_msg == "Medium":
+                    self.settings.set_difficulty("Medium")
+                elif button._button_msg == "Hard":
+                    self.settings.set_difficulty("Hard")
+                self._start_game()
+            break
+
+    def _start_game(self):
+        self.settings.initialize_dynamic_settings()
+        self.stats.reset_stats()
+        self.game_active = True
+
+        self.bullets.empty()
+        self.aliens.empty()
+
+        self._create_fleet()
+        self.ship.center_ship()
+
+        pygame.mouse.set_visible(False)
+
+    def _create_buttons(self):
+        """Create buttons for difficulty levels."""
+        play_buttons = []
+        button_texts = ["SCORES", "Easy", "Medium", "Hard"]
+        button_spacing = 60 
+
+        for i, text in enumerate(button_texts):
+            y_offset = i * button_spacing
+            button = Button(self, text, y_offset=y_offset)
+            play_buttons.append(button)
+
+        return play_buttons
 
 if __name__ == '__main__':
     # Make a game instance, and run the game
