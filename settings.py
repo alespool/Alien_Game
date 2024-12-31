@@ -26,7 +26,10 @@ class Settings:
         self.fleet_drop_speed = 10
 
         # Game speeds up
-        self.speedup_scale = 5.5
+        self.speedup_scale = 1.1
+
+        # Alien points value increase
+        self.score_scale = 1.5
 
         # Set difficulty rates
         self.easy = 0.5
@@ -43,17 +46,22 @@ class Settings:
 
         self.fleet_direction = 1 # 1 is right, -1 is left
 
+        self.alien_points = 50
+
     def increase_speed(self):
         """Increase the speed settings."""
         self.ship_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
 
-    def set_difficulty(self, level):
+        self.alien_points = int(self.alien_points * self.score_scale)
+        print(self.alien_speed)
+    def set_difficulty(self, level:str):
         """Set the difficulty for the settings in the game."""
         if level == "Easy":
             self.alien_speed *= self.easy
             self.bullet_speed *= self.easy
+            print(f"So you chose the {level} difficulty.")
         elif level == "Medium":
             self.alien_speed *= self.medium
             self.bullet_speed *= self.medium
