@@ -225,16 +225,16 @@ class AlienInvasion:
         """Start a new game when the player clicks Play."""
         for button in self.play_buttons:
             if button.rect.collidepoint(mouse_pos) and not self.game_active:
-                if button._button_msg == "SCORES":
+                if button.msg == "SCORES":
                     pass
-                elif button._button_msg == "Easy":
+                elif button.msg == "Easy":
                     self.settings.set_difficulty("Easy")
-                elif button._button_msg == "Medium":
+                elif button.msg == "Medium":
                     self.settings.set_difficulty("Medium")
-                elif button._button_msg == "Hard":
+                elif button.msg == "Hard":
                     self.settings.set_difficulty("Hard")
                 self._start_game()
-            break
+                break
 
     def _start_game(self):
         self.settings.initialize_dynamic_settings()

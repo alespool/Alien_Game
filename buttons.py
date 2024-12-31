@@ -6,6 +6,7 @@ class Button:
         """Initialize the button attributes."""
         self.screen = ai_game.screen
         self.screen_rect = self.screen.get_rect()
+        self.msg = msg
 
         # Set the dimensions of the button
         self.width, self.height = 200,50
