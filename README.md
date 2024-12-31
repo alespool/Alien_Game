@@ -9,3 +9,11 @@ If any alien hits the player’s ship or reaches the bottom of the screen, the p
 Game Demo:
 
 ![game outlook](./images/game_demo.png)
+
+New functions to add (from most important to leasts):
+
+- Scoring
+- Main menu
+- Different alien types
+- Different types of bullets
+- Bullet avoidant alien ships
