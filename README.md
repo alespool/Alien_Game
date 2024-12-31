@@ -8,7 +8,7 @@ If any alien hits the player’s ship or reaches the bottom of the screen, the p
 
 Game Demo:
 
-![game outlook](./images/game_demo.png)
+![game outlook](./images/game_example.png)
 
 New functions to add (from most important to leasts):
 
