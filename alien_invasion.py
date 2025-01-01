@@ -1,5 +1,7 @@
 import sys
 import pygame
+import json
+from pathlib import Path
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
@@ -64,7 +66,7 @@ class AlienInvasion:
         """Check for events or letters typed."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                self._close_game()
 
             if event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
@@ -78,6 +80,11 @@ class AlienInvasion:
     def _check_keydown_events(self, event):
         """Respond to key presses."""
         # Move the ship
+
+        # Start the game with P
+        if event.key == pygame.K_p and not self.game_active:
+            self._start_game()
+
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = True
         elif event.key == pygame.K_LEFT:
@@ -87,15 +94,11 @@ class AlienInvasion:
         elif event.key == pygame.K_DOWN:
             self.ship.moving_down = True
         elif event.key == pygame.K_SPACE:
-            self._fire_bullet()        
-
-        # Start the game with P
-        elif event.key == pygame.K_p and not self.game_active:
-            self._start_game()
+            self._fire_bullet()
 
         # QUIT THE GAME
         if event.key == pygame.K_q:
-            sys.exit()
+            self._close_game()
     
     def _check_keyup_events(self, event):
         if event.key == pygame.K_RIGHT:
@@ -202,7 +205,7 @@ class AlienInvasion:
             self.score.prep_score()
             self.score.check_high_score()
 
-        # If no more aliens, recreate the fleet
+        # If no more aliens, recreate the flee t
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
@@ -310,6 +313,17 @@ class AlienInvasion:
         self.ship.center_ship()
 
         pygame.mouse.set_visible(False)
+
+    def _close_game(self):
+        """Saves highest score and exit the game."""
+        saved_high_score = self.stats.get_saved_high_score()
+        if self.stats.high_score > saved_high_score:
+            path = Path('high_score.json')
+            contents = json.dumps(self.stats.high_score)
+            path.write_text(contents)
+
+
+        sys.exit()
 
 
 if __name__ == '__main__':
