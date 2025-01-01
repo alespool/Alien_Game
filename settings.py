@@ -10,8 +10,8 @@ class Settings:
         # Screen settings
         self.screen_width = 1200
         self.screen_height = 800
+        
         self.bg_color = (0,0,0)
-
 
         self.bg_image = pygame.image.load('images/first_background_resize.jpg')
 
@@ -67,11 +67,3 @@ class Settings:
             self.bullet_speed = 15.0
             self.alien_speed = 35.0
             self.alien_points = 75
-
-    def _draw_menu_gradient(self, start_color, end_color):
-        """Draw a vertical gradient background."""
-        for y in range(self.settings.screen_height):
-            r = start_color[0] + (end_color[0] - start_color[0]) * y // self.settings.screen_height
-            g = start_color[1] + (end_color[1] - start_color[1]) * y // self.settings.screen_height
-            b = start_color[2] + (end_color[2] - start_color[2]) * y // self.settings.screen_height
-            pygame.draw.line(self.screen, (r, g, b), (0, y), (self.settings.screen_width, y))

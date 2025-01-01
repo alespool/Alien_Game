@@ -157,6 +157,7 @@ class AlienInvasion:
 
         if not self.game_active:
             # Create buttons
+            self._draw_menu_gradient((0, 0, 0), (25, 25, 112))  # Black to Midnight Blue
             self.play_button.draw_button()
             self.easy_button.draw_button()
             self.medium_button.draw_button()
@@ -164,6 +165,13 @@ class AlienInvasion:
 
         pygame.display.flip()
 
+    def _draw_menu_gradient(self, start_color, end_color):
+        """Draw a vertical gradient background."""
+        for y in range(self.settings.screen_height):
+            r = start_color[0] + (end_color[0] - start_color[0]) * y // self.settings.screen_height
+            g = start_color[1] + (end_color[1] - start_color[1]) * y // self.settings.screen_height
+            b = start_color[2] + (end_color[2] - start_color[2]) * y // self.settings.screen_height
+            pygame.draw.line(self.screen, (r, g, b), (0, y), (self.settings.screen_width, y))
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
