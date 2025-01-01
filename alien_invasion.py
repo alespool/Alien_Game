@@ -34,7 +34,8 @@ class AlienInvasion:
 
         self._create_fleet()
 
-        self.play_buttons = self._create_buttons()
+        self.play_button = Button(self, "PLAY")
+        self._make_difficulty_buttons()
 
         # Start the game on active state
         self.game_active = False
@@ -72,6 +73,7 @@ class AlienInvasion:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
+                self._check_difficulty_buttons(mouse_pos)
 
     def _check_keydown_events(self, event):
         """Respond to key presses."""
@@ -145,18 +147,20 @@ class AlienInvasion:
         """Update the images on the screen, and flip to the new screen"""
         self.screen.blit(self.settings.bg_image, (0, 0))  # Draw the background image
 
-        for bullet in self.bullets.sprites():
-            bullet.draw_bullet()
-
         self.ship.blitme()
         self.aliens.draw(self.screen)
+
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
 
         self.score.show_score()
 
         if not self.game_active:
             # Create buttons
-            for button in self.play_buttons:
-                button.draw_button()
+            self.play_button.draw_button()
+            self.easy_button.draw_button()
+            self.medium_button.draw_button()
+            self.hard_button.draw_button()
 
         pygame.display.flip()
 
@@ -234,20 +238,58 @@ class AlienInvasion:
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
-        for button in self.play_buttons:
-            if button.rect.collidepoint(mouse_pos) and not self.game_active:
-                if button.msg == "SCORES":
-                    pass
-                elif button.msg == "Easy":
-                    self.settings.set_difficulty("Easy")
-                elif button.msg == "Medium":
-                    self.settings.set_difficulty("Medium")
-                elif button.msg == "Hard":
-                    self.settings.set_difficulty("Hard")
-                self._start_game()
-                break
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.game_active:
+            self._start_game()
+
+    def _make_difficulty_buttons(self):
+        """Create buttons for difficulty levels."""
+        self.easy_button = Button(self, "Easy")
+        self.medium_button = Button(self, "Medium")
+        self.hard_button = Button(self, "Hard")
+
+        # Position buttons on the screen to not overlap
+        self.easy_button.rect.top = (
+            self.play_button.rect.top + 1.5*self.play_button.rect.height)
+        self.easy_button._update_msg_position()
+
+        self.medium_button.rect.top = (
+            self.easy_button.rect.top + 1.5*self.easy_button.rect.height)
+        self.medium_button._update_msg_position()
+
+        self.hard_button.rect.top = (
+            self.medium_button.rect.top + 1.5*self.medium_button.rect.height)
+        self.hard_button._update_msg_position()
+
+        self.medium_button.set_highlighted_color()
+
+    def _check_difficulty_buttons(self, mouse_pos):
+        """Set the right difficulty for the game as chosen with the mouse."""
+        easy_button_clicked = self.easy_button.rect.collidepoint(mouse_pos)
+        medium_button_clicked = self.medium_button.rect.collidepoint(mouse_pos)
+        hard_button_clicked = self.hard_button.rect.collidepoint(mouse_pos)
+
+        if easy_button_clicked:
+            self.settings.difficulty_level = 'Easy'
+            print(self.settings.difficulty_level)
+            self.easy_button.set_highlighted_color()
+            self.medium_button.set_base_color()
+            self.hard_button.set_base_color()
+        elif medium_button_clicked:
+            self.settings.difficulty_level = 'Medium'
+            print(self.settings.difficulty_level)
+            self.easy_button.set_base_color()
+            self.medium_button.set_highlighted_color()
+            self.hard_button.set_base_color()
+        if hard_button_clicked:
+            self.settings.difficulty_level = 'Hard'
+            print(self.settings.difficulty_level)
+            self.easy_button.set_base_color()
+            self.medium_button.set_base_color()
+            self.hard_button.set_highlighted_color()
 
     def _start_game(self):
+        """Start a new game."""
         self.settings.initialize_dynamic_settings()
         self.stats.reset_stats()
         self.score.prep_score()
@@ -261,18 +303,6 @@ class AlienInvasion:
 
         pygame.mouse.set_visible(False)
 
-    def _create_buttons(self):
-        """Create buttons for difficulty levels."""
-        play_buttons = []
-        button_texts = ["SCORES", "Easy", "Medium", "Hard"]
-        button_spacing = 60 
-
-        for i, text in enumerate(button_texts):
-            y_offset = i * button_spacing
-            button = Button(self, text, y_offset=y_offset)
-            play_buttons.append(button)
-
-        return play_buttons
 
 if __name__ == '__main__':
     # Make a game instance, and run the game

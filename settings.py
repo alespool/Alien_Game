@@ -12,6 +12,7 @@ class Settings:
         self.screen_height = 800
         self.bg_color = (0,0,0)
 
+
         self.bg_image = pygame.image.load('images/first_background_resize.jpg')
 
         # Ship settings
@@ -31,22 +32,15 @@ class Settings:
         # Alien points value increase
         self.score_scale = 1.5
 
-        # Set difficulty rates
-        self.easy = 0.5
-        self.medium = 0.7
-        self.hard = 1.0
-
+        # Set initial difficulty
+        self.difficulty_level = 'Medium'
         self.initialize_dynamic_settings()
 
     def initialize_dynamic_settings(self):
         """Initialize the settings that change throughout the game."""
-        self.ship_speed = 25.0
-        self.bullet_speed = 25.0
-        self.alien_speed = 15.0
-
+        print(f"Initializing settings for difficulty: {self.difficulty_level}.")
+        self.set_difficulty()
         self.fleet_direction = 1 # 1 is right, -1 is left
-
-        self.alien_points = 50
 
     def increase_speed(self):
         """Increase the speed settings."""
@@ -55,20 +49,25 @@ class Settings:
         self.alien_speed *= self.speedup_scale
 
         self.alien_points = int(self.alien_points * self.score_scale)
-        print(self.alien_speed)
-    def set_difficulty(self, level:str):
+
+    def set_difficulty(self):
         """Set the difficulty for the settings in the game."""
-        if level == "Easy":
-            self.alien_speed *= self.easy
-            self.bullet_speed *= self.easy
-            print(f"So you chose the {level} difficulty.")
-        elif level == "Medium":
-            self.alien_speed *= self.medium
-            self.bullet_speed *= self.medium
-        elif level == "Hard":
-            self.alien_speed *= self.hard
-            self.bullet_speed *= self.hard
- 
+        if self.difficulty_level == "Easy":
+            self.ship_speed = 25.0
+            self.bullet_speed = 25.0
+            self.alien_speed = 15.0
+            self.alien_points = 25
+        elif self.difficulty_level == "Medium":
+            self.ship_speed = 20.0
+            self.bullet_speed = 20.0
+            self.alien_speed = 25.0
+            self.alien_points = 50
+        elif self.difficulty_level == "Hard":
+            self.ship_speed = 15.0
+            self.bullet_speed = 15.0
+            self.alien_speed = 35.0
+            self.alien_points = 75
+
     def _draw_menu_gradient(self, start_color, end_color):
         """Draw a vertical gradient background."""
         for y in range(self.settings.screen_height):
