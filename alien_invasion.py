@@ -1,6 +1,7 @@
 import sys
 import pygame
 import json
+import random
 from pathlib import Path
 from settings import Settings
 from ship import Ship
@@ -10,7 +11,7 @@ from time import sleep
 from game_stats import GameStats
 from buttons import Button
 from scoreboard import Scoreboard
-
+from fleet_patterns import FleetStructure
 
 class AlienInvasion:
     """Overall class to manage game assets and behaviour"""
@@ -33,6 +34,7 @@ class AlienInvasion:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.fleet = FleetStructure(self)
 
         self._create_fleet()
 
@@ -112,26 +114,31 @@ class AlienInvasion:
 
     def _create_fleet(self):
         """Create the fleet of alien ships."""
-        alien = Alien(self)
-        alien_width, alien_height = alien.rect.size
+        alien_type = self.stats.level % 3 + 1
+        self.aliens.empty()  # Clear existing aliens before creating the new fleet.
 
-        current_x,current_y = alien_width, alien_height
-        while current_y < (self.settings.screen_height -3 * alien_height):
-            while current_x < (self.settings.screen_width - 2 * alien_width):
-                self._create_alien(current_x, current_y)
-                current_x += 2 * alien_width
+        self.fleet.create_fleet(alien_type)
+        
+        # alien = Alien(self)
+        # alien_width, alien_height = alien.rect.size
 
-            # Write another row
-            current_x = alien_width
-            current_y += 2 * alien_height
+        # current_x,current_y = alien_width, alien_height
+        # while current_y < (self.settings.screen_height -3 * alien_height):
+        #     while current_x < (self.settings.screen_width - 2 * alien_width):
+        #         self._create_alien(current_x, current_y, alien_type)
+        #         current_x += 2 * alien_width
 
-    def _create_alien(self, x_position, y_position):
-        """Create a new alien at the defined x position in the row."""
-        new_alien = Alien(self)
-        new_alien.x = x_position
-        new_alien.rect.x = x_position
-        new_alien.rect.y = y_position
-        self.aliens.add(new_alien)
+        #     # Write another row
+        #     current_x = alien_width
+        #     current_y += 2 * alien_height
+
+    # def _create_alien(self, x_position, y_position, alien_type):
+    #     """Create a new alien at the defined x position in the row."""
+    #     new_alien = Alien(self, alien_type)
+    #     new_alien.x = x_position
+    #     new_alien.rect.x = x_position
+    #     new_alien.rect.y = y_position
+    #     self.aliens.add(new_alien)
 
     def _check_fleet_edges(self, delta_time):
         """If any alien ship hits the edge, change behavior."""
@@ -208,6 +215,7 @@ class AlienInvasion:
         # If no more aliens, recreate the flee t
         if not self.aliens:
             self.bullets.empty()
+            self.stats.level += 1
             self._create_fleet()
             self.settings.increase_speed()
 
@@ -348,3 +356,7 @@ if __name__ == '__main__':
     #         new_alien.rect.x = current_x
     #         self.aliens.add(new_alien)
     #         current_x += alien_width + spacing
+
+
+
+
