@@ -10,6 +10,14 @@ Game Demo:
 
 ![game menu](./images/game_menu.png)
 ![game outlook](./images/game_example.png)
+![game outlook](./images/circular_fleet.png)
+
+Current features:
+
+- Scoring
+- Main Menu
+- Increasing difficulty
+- Varied alien fleet layouts
 
 New functions to add (from most important to leasts):
 
