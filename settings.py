@@ -17,6 +17,9 @@ class Settings:
 
         # Ship settings
         self.ship_limit = 3
+        self.ship_acceleration = 10.0
+        self.ship_max_speed = 300.0
+        self.ship_friction = 0.9
 
         # Bullet settings
         self.bullet_width = 3

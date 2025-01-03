@@ -1,4 +1,6 @@
+import math
 import pygame
+
 
 class Ship:
     """A class to manage the ship"""
@@ -10,7 +12,8 @@ class Ship:
         self.settings = ai_game.settings
 
         # Load the ship image and get its rect.
-        self.image = pygame.image.load('images/ships_human.png')
+        self.original_image = pygame.image.load('images/ships_human.png').convert_alpha()
+        self.image = self.original_image
         self.rect = self.image.get_rect()
         
         # Start each new ship at the bottom center of the screen
@@ -22,6 +25,8 @@ class Ship:
         self.x_velocity = 0.0
         self.y_velocity = 0.0
 
+        self.angle = 0
+
         # Direct the ship
         self.moving_right = False
         self.moving_left = False
@@ -32,6 +37,18 @@ class Ship:
     def blitme(self):
         """Draw the ship at its current location"""
         self.screen.blit(self.image, self.rect)
+
+    def update_rotation(self):
+        """Draw the rotated ship at its current location."""
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+
+        # Calculate the angle between the ship and the mouse pointer
+        dx = mouse_x - self.x
+        dy = mouse_y - self.y
+        self.angle = math.degrees(math.atan2(-dy, dx)) - 90  # Subtract 90 to adjust for image orientation.
+
+        self.image = pygame.transform.rotate(self.original_image, self.angle)
+        self.rect = self.image.get_rect(center=(self.x, self.y))
 
     def update(self, delta_time):
         """Update the ship's position with smooth movement"""

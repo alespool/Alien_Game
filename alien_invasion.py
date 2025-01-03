@@ -90,13 +90,13 @@ class AlienInvasion:
         if event.key == pygame.K_p and not self.game_active:
             self._start_game()
 
-        if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             self.ship.moving_right = True
-        elif event.key == pygame.K_LEFT:
+        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
             self.ship.moving_left = True
-        elif event.key == pygame.K_UP:
+        elif event.key == pygame.K_UP or event.key == pygame.K_w:
             self.ship.moving_up = True
-        elif event.key == pygame.K_DOWN:
+        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
             self.ship.moving_down = True
         elif event.key == pygame.K_SPACE:
             self._play_noise('laserShoot')
@@ -107,13 +107,13 @@ class AlienInvasion:
             self._close_game()
     
     def _check_keyup_events(self, event):
-        if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             self.ship.moving_right = False
-        elif event.key == pygame.K_LEFT:
+        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
             self.ship.moving_left = False
-        elif event.key == pygame.K_UP:
+        elif event.key == pygame.K_UP or event.key == pygame.K_w:
             self.ship.moving_up = False
-        elif event.key == pygame.K_DOWN:
+        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
             self.ship.moving_down = False
 
     def _create_fleet(self):
@@ -161,7 +161,9 @@ class AlienInvasion:
         """Update the images on the screen, and flip to the new screen"""
         self.screen.blit(self.settings.bg_image, (0, 0))  # Draw the background image
 
+        self.ship.update_rotation()
         self.ship.blitme()
+        self.draw_mouse_indicator(self.screen)
         self.aliens.draw(self.screen)
 
         for bullet in self.bullets.sprites():
@@ -331,6 +333,16 @@ class AlienInvasion:
         self.ship.center_ship()
 
         pygame.mouse.set_visible(False)
+
+    def draw_mouse_indicator(self, screen):
+        """Draw a custom indicator at the mouse position."""
+        mouse_pos = pygame.mouse.get_pos()
+        pygame.draw.circle(screen, (255, 0, 0), mouse_pos, 5)  # Red dot
+        pygame.draw.line(screen, (255, 0, 0), (mouse_pos[0] - 10, mouse_pos[1]), 
+                        (mouse_pos[0] + 10, mouse_pos[1]), 2)  # Horizontal line
+        pygame.draw.line(screen, (255, 0, 0), (mouse_pos[0], mouse_pos[1] - 10), 
+                        (mouse_pos[0], mouse_pos[1] + 10), 2)  # Vertical line
+
 
     def _close_game(self):
         """Saves highest score and exit the game."""
