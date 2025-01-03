@@ -191,7 +191,13 @@ class AlienInvasion:
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
-        new_bullet = Bullet(self)
+        # Get the mouse position 
+        pos = pygame.mouse.get_pos()
+
+        mouse_x = pos[0]
+        mouse_y = pos[1]
+
+        new_bullet = Bullet(self, mouse_x, mouse_y)
         self.bullets.add(new_bullet)
         
     def _update_bullets(self, delta_time):

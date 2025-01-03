@@ -22,8 +22,8 @@ class Settings:
         self.ship_friction = 0.9
 
         # Bullet settings
-        self.bullet_width = 3
-        self.bullet_height = 15
+        self.bullet_width = 15
+        self.bullet_height = 3
         self.bullet_color = (255, 215, 0)
 
         # Alien settings 
