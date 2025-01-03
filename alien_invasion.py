@@ -12,6 +12,8 @@ from game_stats import GameStats
 from buttons import Button
 from scoreboard import Scoreboard
 from fleet_patterns import FleetStructure
+from sounds import SoundManager
+
 
 class AlienInvasion:
     """Overall class to manage game assets and behaviour"""
@@ -20,6 +22,7 @@ class AlienInvasion:
         """Initialize the game, create game resources"""
         pygame.init()
 
+        self.sound_manager = SoundManager()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
@@ -96,6 +99,7 @@ class AlienInvasion:
         elif event.key == pygame.K_DOWN:
             self.ship.moving_down = True
         elif event.key == pygame.K_SPACE:
+            self._play_noise('laserShoot')
             self._fire_bullet()
 
         # QUIT THE GAME
@@ -166,7 +170,7 @@ class AlienInvasion:
         self.score.show_score()
 
         if not self.game_active:
-            # Create buttons
+            self.sound_manager.play_music('sounds/gameplaySound.mp3')  # Play music
             self._draw_menu_gradient((0, 0, 0), (25, 25, 112))  # Black to Midnight Blue
             self.play_button.draw_button()
             self.easy_button.draw_button()
@@ -198,7 +202,11 @@ class AlienInvasion:
                 self.bullets.remove(bullet)
 
         self._check_bullet_alien_collision()
-
+        
+    def _play_noise(self, selection:str):
+        """Select a sound to be made when an event happens."""
+        self.sound_manager.play_sound_effect(selection)
+        
     def _check_bullet_alien_collision(self):
         """Respond to bullet-alien collisions."""
         # If bullets hit the alien do collision
@@ -207,6 +215,7 @@ class AlienInvasion:
         )
 
         if collision:
+            self._play_noise('damageSound')
             for aliens in collision.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.score.prep_score()
@@ -259,6 +268,7 @@ class AlienInvasion:
         """Start a new game when the player clicks Play."""
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.game_active:
+            self._play_noise('enterGameSound')
             self._start_game()
 
     def _make_difficulty_buttons(self):
@@ -289,20 +299,20 @@ class AlienInvasion:
         hard_button_clicked = self.hard_button.rect.collidepoint(mouse_pos)
 
         if easy_button_clicked:
+            self._play_noise('selectionSound')
             self.settings.difficulty_level = 'Easy'
-            print(self.settings.difficulty_level)
             self.easy_button.set_highlighted_color()
             self.medium_button.set_base_color()
             self.hard_button.set_base_color()
         elif medium_button_clicked:
+            self._play_noise('selectionSound')
             self.settings.difficulty_level = 'Medium'
-            print(self.settings.difficulty_level)
             self.easy_button.set_base_color()
             self.medium_button.set_highlighted_color()
             self.hard_button.set_base_color()
         if hard_button_clicked:
+            self._play_noise('selectionSound')           
             self.settings.difficulty_level = 'Hard'
-            print(self.settings.difficulty_level)
             self.easy_button.set_base_color()
             self.medium_button.set_base_color()
             self.hard_button.set_highlighted_color()

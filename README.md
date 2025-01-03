@@ -23,6 +23,7 @@ New functions to add (from most important to leasts):
 
 - Scoring (✔️)
 - Main menu (✔️)
+- Sounds (75%)
 - Different alien types
 - Different types of bullets
 - Bullet avoidant alien ships
