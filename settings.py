@@ -20,6 +20,7 @@ class Settings:
         self.ship_acceleration = 10.0
         self.ship_max_speed = 300.0
         self.ship_friction = 0.9
+        self.shield_strength = 0  # Default shield strength
 
         # Bullet settings
         self.bullet_width = 10
@@ -44,6 +45,7 @@ class Settings:
         print(f"Initializing settings for difficulty: {self.difficulty_level}.")
         self.set_difficulty()
         self.fleet_direction = 1 # 1 is right, -1 is left
+        self.shield_strength = 0  # Reset shield strength
 
     def increase_speed(self):
         """Increase the speed settings."""
