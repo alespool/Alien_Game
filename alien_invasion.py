@@ -48,28 +48,30 @@ class AlienInvasion:
         self.game_active = False
 
     def run_game(self):
-        """Start the main game loop"""
+        """Start the main game loop."""
         while True:
-            # Watch for keyboard and mouse events
+            # Check events
             self._check_events()
 
-            # Calculate time passed between frames (delta_time)
+            # Calculate delta time
             delta_time = self.clock.get_time() / 100  # Time in seconds
-            
+
             if self.game_active:
-                self.ship.update(delta_time)
+                self.ship.update_position(delta_time) 
+                self.ship.update_rotation()
                 self._update_bullets(delta_time)
                 self._update_aliens(delta_time)
 
-            # Redraw the screen during each pass to give the color
+            # Redraw screen
             self._update_screen()
-            # Set the internal game clock
-            self.clock.tick(120)
 
+            # Limit frame rate
+            self.clock.tick(120)
 
     def _check_events(self):
         """Check for events or letters typed."""
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 self._close_game()
 
@@ -84,20 +86,19 @@ class AlienInvasion:
 
     def _check_keydown_events(self, event):
         """Respond to key presses."""
-        # Move the ship
-
         # Start the game with P
         if event.key == pygame.K_p and not self.game_active:
             self._start_game()
 
+        # Move the ship with the arrow keys or WASD
         if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            self.ship.moving_right = True
+            self.ship.movement.moving_right = True
         elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            self.ship.moving_left = True
+            self.ship.movement.moving_left = True
         elif event.key == pygame.K_UP or event.key == pygame.K_w:
-            self.ship.moving_up = True
+            self.ship.movement.moving_up = True
         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-            self.ship.moving_down = True
+            self.ship.movement.moving_down = True
         elif event.key == pygame.K_SPACE:
             self._play_noise('laserShoot')
             self._fire_bullet()
@@ -108,13 +109,13 @@ class AlienInvasion:
     
     def _check_keyup_events(self, event):
         if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            self.ship.moving_right = False
+            self.ship.movement.moving_right = False
         elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            self.ship.moving_left = False
+            self.ship.movement.moving_left = False
         elif event.key == pygame.K_UP or event.key == pygame.K_w:
-            self.ship.moving_up = False
+            self.ship.movement.moving_up = False
         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-            self.ship.moving_down = False
+            self.ship.movement.moving_down = False
 
     def _create_fleet(self):
         """Create the fleet of alien ships."""
@@ -122,27 +123,6 @@ class AlienInvasion:
         self.aliens.empty()  # Clear existing aliens before creating the new fleet.
 
         self.fleet.create_fleet(alien_type)
-        
-        # alien = Alien(self)
-        # alien_width, alien_height = alien.rect.size
-
-        # current_x,current_y = alien_width, alien_height
-        # while current_y < (self.settings.screen_height -3 * alien_height):
-        #     while current_x < (self.settings.screen_width - 2 * alien_width):
-        #         self._create_alien(current_x, current_y, alien_type)
-        #         current_x += 2 * alien_width
-
-        #     # Write another row
-        #     current_x = alien_width
-        #     current_y += 2 * alien_height
-
-    # def _create_alien(self, x_position, y_position, alien_type):
-    #     """Create a new alien at the defined x position in the row."""
-    #     new_alien = Alien(self, alien_type)
-    #     new_alien.x = x_position
-    #     new_alien.rect.x = x_position
-    #     new_alien.rect.y = y_position
-    #     self.aliens.add(new_alien)
 
     def _check_fleet_edges(self, delta_time):
         """If any alien ship hits the edge, change behavior."""
@@ -161,7 +141,6 @@ class AlienInvasion:
         """Update the images on the screen, and flip to the new screen"""
         self.screen.blit(self.settings.bg_image, (0, 0))  # Draw the background image
 
-        self.ship.update_rotation()
         self.ship.blitme()
         self.draw_mouse_indicator(self.screen)
         self.aliens.draw(self.screen)
@@ -366,25 +345,3 @@ if __name__ == '__main__':
     # Make a game instance, and run the game
     ai = AlienInvasion()
     ai.run_game()
-
-
-
-    # def _create_fleet(self):
-    #     """Create the fleet of alien ships that we need to destroy."""
-    #     alien = Alien(self)
-    #     alien_width = alien.rect.width
-    #     total_space = self.settings.screen_width - 2 * alien_width
-
-    #     spacing = (total_space - (25 * alien_width)) / 24  # 25 aliens, 24 gaps
-
-    #     current_x = alien_width
-    #     for _ in range(25):
-    #         new_alien = Alien(self)
-    #         new_alien.x = current_x
-    #         new_alien.rect.x = current_x
-    #         self.aliens.add(new_alien)
-    #         current_x += alien_width + spacing
-
-
-
-
