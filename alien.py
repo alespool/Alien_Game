@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from images import Images
 
 class Alien(Sprite):
     """A class to manage bullets fired from the ship"""
@@ -9,14 +10,15 @@ class Alien(Sprite):
         super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
+        self.image_retrieve = Images()
 
         # Load the alien image and set its rect attribute
         if alien_type == 1:
-            self.image = pygame.image.load('images/first_alien_cut.png')
+            self.image = self.image_retrieve.aliens['first_alien']
         elif alien_type == 2:
-            self.image = pygame.image.load('images/second_alien_cut.png')
+            self.image = self.image_retrieve.aliens['second_alien']
         elif alien_type == 3:
-            self.image = pygame.image.load('images/third_alien_cut.png')
+            self.image = self.image_retrieve.aliens['third_alien']
         self.rect = self.image.get_rect()
 
         # Start each new alien at the top left

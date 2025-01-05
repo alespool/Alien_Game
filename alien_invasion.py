@@ -13,6 +13,8 @@ from buttons import Button
 from scoreboard import Scoreboard
 from fleet_patterns import FleetStructure
 from sounds import SoundManager
+from images import Images
+from upgrades import Upgrade
 
 
 class AlienInvasion:
@@ -22,22 +24,27 @@ class AlienInvasion:
         """Initialize the game, create game resources"""
         pygame.init()
 
-        self.sound_manager = SoundManager()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
-
+ 
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
 
-        # Create an instance to store the stats
+        self.sound_manager = SoundManager()
+        self.image_retrieve = Images()
+
+        # Create an instance to store the stats  
         self.stats = GameStats(self)
         self.score = Scoreboard(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.upgrades = pygame.sprite.Group()
         self.fleet = FleetStructure(self)
+        self.enemies_killed = 0
+        self.upgrade_spawned = False
 
         self._create_fleet()
 
@@ -45,7 +52,7 @@ class AlienInvasion:
         self._make_difficulty_buttons()
 
         # Start the game on active state
-        self.game_active = False
+        self.game_active = False  
 
     def run_game(self):
         """Start the main game loop."""
@@ -139,11 +146,12 @@ class AlienInvasion:
 
     def _update_screen(self):
         """Update the images on the screen, and flip to the new screen"""
-        self.screen.blit(self.settings.bg_image, (0, 0))  # Draw the background image
+        self.screen.blit(self.image_retrieve.backgrounds['first_background'], (0, 0))  # Draw the background image
 
         self.ship.blitme()
         self.draw_mouse_indicator(self.screen)
         self.aliens.draw(self.screen)
+        self.upgrades.draw(self.screen)
 
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
@@ -151,7 +159,7 @@ class AlienInvasion:
         self.score.show_score()
 
         if not self.game_active:
-            self.sound_manager.play_music('sounds/gameplaySound.mp3')  # Play music
+            # self.sound_manager.play_music('sounds/gameplaySound.mp3')  # Play music
             self._draw_menu_gradient((0, 0, 0), (25, 25, 112))  # Black to Midnight Blue
             self.play_button.draw_button()
             self.easy_button.draw_button()
@@ -207,13 +215,28 @@ class AlienInvasion:
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.score.prep_score()
             self.score.check_high_score()
+            self.enemies_killed += len(aliens)
+            if self.enemies_killed >= 10 and not self.upgrade_spawned:
+                self._create_upgrade()
+                self.enemies_killed = 0
 
-        # If no more aliens, recreate the flee t
+        # If no more aliens, recreate the fleet
         if not self.aliens:
             self.bullets.empty()
             self.stats.level += 1
             self._create_fleet()
             self.settings.increase_speed()
+
+
+    def _create_upgrade(self):
+        """Create an upgrade at a random location."""
+        upgrade_type = random.choice(['shooting_speed'])
+        location = (random.randint(0, self.settings.screen_width), 
+                    random.randint(0, self.settings.screen_height))
+        upgrade = Upgrade(upgrade_type, location, self.image_retrieve )
+        self.upgrades.add(upgrade)
+        print(f"Created upgrade: {upgrade_type} at {location}")
+
 
     def _update_aliens(self, delta_time):
         """Update the alien fleet position."""
@@ -225,7 +248,15 @@ class AlienInvasion:
             self._ship_hit()
         
         self._check_aliens_bottom()
+        self._check_upgrade_collision()
         
+    def _check_upgrade_collision(self):
+        """Check for collisions between the ship and upgrades."""
+        upgrade_collisions = pygame.sprite.spritecollide(self.ship, self.upgrades, True)
+        for upgrade in upgrade_collisions:
+            upgrade.apply_upgrade(self.ship)
+            self.upgrade_spawned = False
+
     def _ship_hit(self):
         """Respond to the ship being hit by an alien."""
         if self.stats.ships_remaining > 0:

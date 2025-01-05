@@ -1,6 +1,6 @@
 import math
 import pygame
-
+from images import Images
 
 class Ship:
     """A class to manage the ship"""
@@ -10,9 +10,10 @@ class Ship:
         self.screen = ai_game.screen
         self.screen_rect = ai_game.screen.get_rect()
         self.settings = ai_game.settings
+        self.image_retrieve = Images()
 
         # Load the ship image and get its rect.
-        self.original_image = pygame.image.load('images/ships_human.png').convert_alpha()
+        self.original_image = self.image_retrieve.ships['human_ship']
         self.image = self.original_image
         self.rect = self.image.get_rect()
         
