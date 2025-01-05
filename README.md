@@ -18,6 +18,10 @@ Current features:
 - Main Menu
 - Increasing difficulty
 - Varied alien fleet layouts
+- Class for movement
+- Upgrades for ship
+- Smooth movement
+- Mouse pointer
 
 New functions to add (from most important to leasts):
 
@@ -27,3 +31,5 @@ New functions to add (from most important to leasts):
 - Different alien types
 - Different types of bullets
 - Bullet avoidant alien ships
+
+# TODO: add class for movement of ship
