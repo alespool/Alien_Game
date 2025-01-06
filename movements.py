@@ -30,7 +30,7 @@ class MovementSystem:
         """Update position using physics-based movement"""
         # Get movement parameters
         acceleration = self.settings.ship_acceleration
-        max_speed = self.settings.ship_max_speed
+        max_speed = self.settings.ship_speed
         friction = self.settings.ship_friction
         
         # Update horizontal velocity

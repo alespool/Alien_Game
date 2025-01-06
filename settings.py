@@ -18,14 +18,8 @@ class Settings:
         # Ship settings
         self.ship_limit = 3
         self.ship_acceleration = 10.0
-        self.ship_max_speed = 300.0
-        self.ship_friction = 0.9
+        self.ship_friction = 0.92
         self.shield_strength = 0  # Default shield strength
-
-        # Bullet settings
-        self.bullet_width = 10
-        self.bullet_height = 4
-        self.bullet_color = (255, 215, 0)
 
         # Alien settings 
         self.fleet_drop_speed = 10
@@ -58,12 +52,12 @@ class Settings:
     def set_difficulty(self):
         """Set the difficulty for the settings in the game."""
         if self.difficulty_level == "Easy":
-            self.ship_speed = 40.0
-            self.bullet_speed = 45.0
-            self.alien_speed = 25.0
+            self.ship_speed = 80.0
+            self.bullet_speed = 75.0
+            self.alien_speed = 35.0
             self.alien_points = 25
         elif self.difficulty_level == "Medium":
-            self.ship_speed = 20.0
+            self.ship_speed = 80.0
             self.bullet_speed = 20.0
             self.alien_speed = 25.0
             self.alien_points = 50
