@@ -45,6 +45,7 @@ class AlienInvasion:
         self.fleet = FleetStructure(self)
         self.enemies_killed = 0
         self.upgrade_spawned = False
+        self.bullet_type = 'bullet'  # Initialize bullet_type
 
         self._create_fleet()
 
@@ -184,8 +185,12 @@ class AlienInvasion:
         mouse_x = pos[0]
         mouse_y = pos[1]
 
-        new_bullet = Bullet(self, mouse_x, mouse_y)
+        new_bullet = Bullet(self, mouse_x, mouse_y, self.bullet_type)
         self.bullets.add(new_bullet)
+
+        # Reset bullet_type to 'bullet' after firing a missile
+        if self.bullet_type == 'missile':
+            self.bullet_type = 'bullet'
         
     def _update_bullets(self, delta_time):
         """Update position of bullets and get rid of old bullets."""
@@ -216,8 +221,8 @@ class AlienInvasion:
             self.score.prep_score()
             self.score.check_high_score()
             self.enemies_killed += len(aliens)
-            if self.enemies_killed >= 10 and not self.upgrade_spawned:
-                self._create_upgrade()
+            if self.enemies_killed >= 2 and not self.upgrade_spawned:
+                self._create_upgrade() 
                 self.enemies_killed = 0
 
         # If no more aliens, recreate the fleet
@@ -230,10 +235,10 @@ class AlienInvasion:
 
     def _create_upgrade(self):
         """Create an upgrade at a random location."""
-        upgrade_type = random.choice(['shooting_speed'])
+        upgrade_type = random.choice(['missile'])
         location = (random.randint(0, self.settings.screen_width), 
                     random.randint(0, self.settings.screen_height))
-        upgrade = Upgrade(upgrade_type, location, self.image_retrieve )
+        upgrade = Upgrade(upgrade_type, location, self.image_retrieve)
         self.upgrades.add(upgrade)
         print(f"Created upgrade: {upgrade_type} at {location}")
 
@@ -256,23 +261,30 @@ class AlienInvasion:
         for upgrade in upgrade_collisions:
             upgrade.apply_upgrade(self.ship)
             self.upgrade_spawned = False
+            if upgrade.upgrade_type == 'missile':
+                self.bullet_type = 'missile'
+            print(f"Applied upgrade: {self.bullet_type} to ship.")
 
     def _ship_hit(self):
         """Respond to the ship being hit by an alien."""
-        if self.stats.ships_remaining > 0:
-            self.stats.ships_remaining -= 1
-
-            # Get rid of remaining bullets and aliens
-            self.bullets.empty()
-            self.aliens.empty()
-
-            # Create a new fleet and center the ship
-            self._create_fleet()
+        if self.settings.shield_strength > 0:
+            self.settings.shield_strength -= 1
             self.ship.center_ship()
-            sleep(0.5)
         else:
-            self.game_active = False
-            pygame.mouse.set_visible(True)
+            if self.stats.ships_remaining > 0:
+                self.stats.ships_remaining -= 1
+
+                # Get rid of remaining bullets and aliens
+                self.bullets.empty()
+                self.aliens.empty()
+
+                # Create a new fleet and center the ship
+                self._create_fleet()
+                self.ship.center_ship()
+                sleep(0.5)
+            else:
+                self.game_active = False
+                pygame.mouse.set_visible(True)
 
     def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""

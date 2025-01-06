@@ -1,17 +1,21 @@
 import pygame
 import math
 from pygame.sprite import Sprite
+from images import Images
 
 class Bullet(Sprite):
     """A class to manage bullets fired from the ship"""
     
-    def __init__(self, ai_game, mouse_x, mouse_y):
-        """Create a bullet object at the ship's current location"""
+    def __init__(self, ai_game, mouse_x, mouse_y, bullet_type):
+        """Initialize the missile attributes."""
         super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
-        self.color = self.settings.bullet_color
-        
+        self.image = Images()
+
+        print(bullet_type)
+        self.image_retrieve = self.image.bullets[bullet_type]
+
         # Get starting position from ship
         start_x, start_y = ai_game.ship.rect.center
         self.pos = [float(start_x), float(start_y)]
@@ -25,10 +29,8 @@ class Bullet(Sprite):
             self.dir = (self.dir[0]/length, self.dir[1]/length)
         
         # Create and rotate the bullet surface
-        self.bullet = pygame.Surface(
-            (self.settings.bullet_width, self.settings.bullet_height)
-        ).convert_alpha()
-        self.bullet.fill(self.color)
+        # self.bullet_type = _bullet_type()
+        self.bullet = self.image_retrieve
         
         # Calculate angle and rotate bullet
         angle = math.degrees(math.atan2(-self.dir[1], self.dir[0]))

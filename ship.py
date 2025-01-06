@@ -36,6 +36,10 @@ class Ship:
         """Center the ship on the middle of the screen."""
         self.movement.center_entity()
 
-    def apply_upgrade(self, upgrade):
-        """Apply an upgrade to the ship."""
-        upgrade.apply_upgrade(self)
+    def shield_hit(self):
+        """Handle the ship being hit by an alien."""
+        if self.settings.shield_strength > 0:
+            self.settings.shield_strength -= 1
+        else:
+            self.settings.ships_left -= 1
+            self.center_ship()
