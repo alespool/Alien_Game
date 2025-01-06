@@ -14,7 +14,9 @@ IMAGES = {
     'BULLETS': {'bullet': 'images/bullets/bullet.png',
                 'missile': 'images/bullets/missile.png',
                 'laser' : 'images/bullets/laser.png'},
-    'BACKGROUNDS': {'first_background': 'images/first_background_resize.jpg'}, 
+    'BACKGROUNDS': {'first_background': 'images/first_background_resize.jpg',
+                    'second_background': 'images/second_background_resize.jpg',},
+    'BOSS': {'boss': 'images/first_boss.png'},
 }
 
 class Images:
@@ -27,6 +29,7 @@ class Images:
         self.ships = self.load_images(IMAGES['SHIPS'])
         self.bullets = self.load_images(IMAGES['BULLETS'])
         self.backgrounds = self.load_images(IMAGES['BACKGROUNDS'])
+        self.boss = self.load_images(IMAGES['BOSS'])
 
     def load_images(self, image_dict):
         """Load all images from a dictionary."""
