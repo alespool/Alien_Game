@@ -6,7 +6,7 @@ from pathlib import Path
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
-from alien import Alien
+from alien import Alien, BossAlien
 from time import sleep
 from game_stats import GameStats
 from buttons import Button
@@ -54,6 +54,8 @@ class AlienInvasion:
 
         # Start the game on active state
         self.game_active = False  
+
+        self.boss = None
 
     def run_game(self):
         """Start the main game loop."""
@@ -160,22 +162,12 @@ class AlienInvasion:
         self.score.show_score()
 
         if not self.game_active:
-            # self.sound_manager.play_music('sounds/gameplaySound.mp3')  # Play music
-            self._draw_menu_gradient((0, 0, 0), (25, 25, 112))  # Black to Midnight Blue
             self.play_button.draw_button()
             self.easy_button.draw_button()
             self.medium_button.draw_button()
             self.hard_button.draw_button()
 
         pygame.display.flip()
-
-    def _draw_menu_gradient(self, start_color, end_color):
-        """Draw a vertical gradient background."""
-        for y in range(self.settings.screen_height):
-            r = start_color[0] + (end_color[0] - start_color[0]) * y // self.settings.screen_height
-            g = start_color[1] + (end_color[1] - start_color[1]) * y // self.settings.screen_height
-            b = start_color[2] + (end_color[2] - start_color[2]) * y // self.settings.screen_height
-            pygame.draw.line(self.screen, (r, g, b), (0, y), (self.settings.screen_width, y))
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
@@ -212,7 +204,7 @@ class AlienInvasion:
         """Respond to bullet-alien collisions."""
         # If bullets hit the alien do collision
         collision = pygame.sprite.groupcollide(
-                self.bullets, self.aliens, True, True # True means it will remove the sprite from the group
+                self.bullets, self.aliens, False, True # True means it will remove the sprite from the group
         )
 
         if collision:
@@ -230,8 +222,11 @@ class AlienInvasion:
         if not self.aliens:
             self.bullets.empty()
             self.stats.level += 1
-            self._create_fleet()
-            self.settings.increase_speed()
+            if self.stats.level % 5 == 0:  # Example condition for boss level
+                self._start_boss_fight()
+            else:
+                self._create_fleet()
+                self.settings.increase_speed()
 
 
     def _create_upgrade(self):
@@ -265,7 +260,7 @@ class AlienInvasion:
             if upgrade.upgrade_type == 'missile':
                 self.bullet_type = 'missile'
             if upgrade.upgrade_type == 'laser':
-                self.bullet_type == 'laser'
+                self.bullet_type = 'laser'
                 
 
     def _ship_hit(self):
@@ -385,6 +380,11 @@ class AlienInvasion:
 
 
         sys.exit()
+
+    def _start_boss_fight(self):
+        """Start the boss fight."""
+        self.boss = BossAlien(self)
+        self.aliens.add(self.boss)
 
 
 if __name__ == '__main__':
