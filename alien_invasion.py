@@ -45,7 +45,7 @@ class AlienInvasion:
         self.fleet = FleetStructure(self)
         self.enemies_killed = 0
         self.upgrade_spawned = False
-        self.bullet_type = 'bullet'  # Initialize bullet_type
+        self.bullet_type = 'bullet'
 
         self._create_fleet()
 
@@ -188,8 +188,9 @@ class AlienInvasion:
         new_bullet = Bullet(self, mouse_x, mouse_y, self.bullet_type)
         self.bullets.add(new_bullet)
 
-        # Reset bullet_type to 'bullet' after firing a missile
-        if self.bullet_type == 'missile':
+        # Reset bullet_type
+        print(f"Bullet type: {self.bullet_type}")
+        if self.bullet_type == 'missile' or self.bullet_type == 'laser':
             self.bullet_type = 'bullet'
         
     def _update_bullets(self, delta_time):
@@ -235,7 +236,7 @@ class AlienInvasion:
 
     def _create_upgrade(self):
         """Create an upgrade at a random location."""
-        upgrade_type = random.choice(['missile'])
+        upgrade_type = random.choice(['missile','laser'])  
         location = (random.randint(0, self.settings.screen_width), 
                     random.randint(0, self.settings.screen_height))
         upgrade = Upgrade(upgrade_type, location, self.image_retrieve)
@@ -263,7 +264,9 @@ class AlienInvasion:
             self.upgrade_spawned = False
             if upgrade.upgrade_type == 'missile':
                 self.bullet_type = 'missile'
-            print(f"Applied upgrade: {self.bullet_type} to ship.")
+            if upgrade.upgrade_type == 'laser':
+                self.bullet_type == 'laser'
+                
 
     def _ship_hit(self):
         """Respond to the ship being hit by an alien."""
