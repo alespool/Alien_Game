@@ -1,5 +1,5 @@
 import pygame
-
+from images import Images
 
 class Scene:
     """
@@ -36,18 +36,17 @@ class Scene:
         pass
 
 
-class Menu(Scene):
+class MenuScene(Scene):
     """
     The main menu scene of the game
 
     Attributes:
-        image1 (pygame.Surface): The first image in the menu
-        image2 (pygame.Surface): The second image in the menu
-        # ... and so on ...
+        None
     """
-    def __init__(self):
+    def __init__(self, settings):
         """ Initializes the menu scene """
-        pass
+        super().__init__()
+        self.settings = settings
 
     def setup(self):
         """ Loads all necessary data """
@@ -63,4 +62,99 @@ class Menu(Scene):
     
     def render(self, screen):
         """ Draws the menu scene to the screen """
+        self._draw_menu_gradient(screen, (0, 0, 0), (25, 25, 112)) 
+
+    def _draw_menu_gradient(self, screen, start_color, end_color):
+        """Draw a vertical gradient background."""
+        for y in range(self.settings.screen_height):
+            r = start_color[0] + (end_color[0] - start_color[0]) * y // self.settings.screen_height
+            g = start_color[1] + (end_color[1] - start_color[1]) * y // self.settings.screen_height
+            b = start_color[2] + (end_color[2] - start_color[2]) * y // self.settings.screen_height
+            pygame.draw.line(screen, (r, g, b), (0, y), (self.settings.screen_width, y))
+
+
+class Inventory(Scene):
+    """
+    The inventory scene of the game
+
+    Attributes:
+        items (list): A list of items in the inventory
+        selected_item (int): The index of the selected item
+    """
+    def __init__(self):
+        """ Initializes the inventory scene """
         pass
+
+    def setup(self):
+        """ Loads all necessary data """
+        pass
+
+    def handle_events(self, events):
+        """ Handles events for the inventory scene """
+        pass
+
+    def update(self, dt):
+        """ Runs any necessary logic for the inventory scene """
+        pass
+    
+    def render(self, screen):
+        """ Draws the inventory scene to the screen """
+        pass
+
+class BossScene(Scene):
+    """
+    The boss fight scene of the game
+
+    Attributes:
+        boss (pygame.Surface): The boss image
+    """
+    def __init__(self):
+        """ Initializes the boss scene """
+        super().__init__()
+        self.boss = None
+        self.image_retrieve = Images()
+        
+    def setup(self):
+        """ Loads all necessary data """
+        self.boss = self.image_retrieve.boss['boss']
+
+    def handle_events(self, events):
+        """ Handles events for the boss scene """
+        pass
+
+    def update(self, dt):
+        """ Runs any necessary logic for the boss scene """
+        pass
+    
+    def render(self, screen):
+        """ Draws the boss scene to the screen """
+        screen.blit(self.boss, (100, 100))  # Example position
+
+class BasicScene(Scene):
+    """
+    The basic scene of the game
+
+    Attributes:
+        background (pygame.Surface): The background image
+    """
+    def __init__(self):
+        """ Initializes the basic scene """
+        super().__init__()
+        self.background = None
+        self.image_retrieve = Images()
+
+    def setup(self):
+        """ Loads all necessary data """
+        self.background = self.image_retrieve.backgrounds['first_background']
+
+    def handle_events(self, events):
+        """ Handles events for the basic scene """
+        pass
+
+    def update(self, dt):
+        """ Runs any necessary logic for the basic scene """
+        pass
+    
+    def render(self, screen):
+        """ Draws the basic scene to the screen """
+        screen.blit(self.background, (0, 0))  # Draw the background image
