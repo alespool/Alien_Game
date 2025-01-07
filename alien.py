@@ -1,4 +1,6 @@
+import math
 import pygame
+import random
 from pygame.sprite import Sprite
 from images import Images
 
@@ -8,6 +10,7 @@ class Alien(Sprite):
     def __init__(self, ai_game, alien_type=1):
         """Initialize the alien and set its starting position."""
         super().__init__()
+        self.ai_game = ai_game
         self.screen = ai_game.screen
         self.settings = ai_game.settings
         self.image_retrieve = Images()
@@ -19,26 +22,76 @@ class Alien(Sprite):
             self.image = self.image_retrieve.aliens['second_alien']
         elif alien_type == 3:
             self.image = self.image_retrieve.aliens['third_alien']
+
         self.rect = self.image.get_rect()
 
         # Start each new alien at the top left
-        self.rect.x = self.rect.width
-        self.rect.y = self.rect.height
+        self.spawn_aliens()
 
         # Store the alien's exact horizontal position
         self.x = float(self.rect.x)
 
+    def update(self, delta_time):
+        
+        self.rect.x += self.x_speed * delta_time
+        self.rect.y += self.y_speed * delta_time       
+        
+        dir_x, dir_y = self.ai_game.ship.movement.x - self.rect.x, self.ai_game.ship.movement.y - self.rect.y
+        self.rotation = (180 / math.pi) * -math.atan2(-dir_x, -dir_y)
+        self.image = pygame.transform.rotate(self.image, self.rotation)
+
+        # self.check_edges()
+
+    def spawn_aliens(self):
+        """Spawn alien ships at random positions."""
+        self.direction = random.randrange(4)
+        if self.direction == 0:
+            self.rect.x = random.randrange(self.settings.screen_width - self.rect.width)
+            self.rect.y = random.randrange(-20, -4)
+            self.x_speed = 0
+            self.y_speed = random.randrange(1, 8)
+        elif self.direction == 1:
+            self.rect.x = random.randrange(self.settings.screen_width - self.rect.width)
+            self.rect.y = random.randrange(self.settings.screen_height, self.settings.screen_height + 6)
+            self.x_speed = 0
+            self.y_speed = -random.randrange(1, 8)
+        elif self.direction == 2:
+            self.rect.x = random.randrange(-20, -4)
+            self.rect.y = random.randrange(self.settings.screen_height - self.rect.height)
+            self.x_speed = random.randrange(1, 8)
+            self.y_speed = 0
+        elif self.direction == 3:
+            self.rect.x = random.randrange(self.settings.screen_width, self.settings.screen_width + 6)
+            self.rect.y = random.randrange(self.settings.screen_height - self.rect.height)
+            self.x_speed = -random.randrange(1, 8)
+            self.y_speed = 0
+
+    # def _create_alien(self, x_position, y_position, alien_type):
+    #     """Create a new alien at the defined x and y positions."""
+    #     new_alien = Alien(self, alien_type)
+    #     new_alien.x = x_position
+    #     new_alien.rect.x = x_position
+    #     new_alien.rect.y = y_position
+    #     self.aliens.add(new_alien)
+
+
+
     def check_edges(self):
         """Return True if an alien ship has hit the edge of the screen."""
-        screen_rect = self.screen.get_rect()
-        if (self.rect.right >= screen_rect.right) or (self.rect.left <= 0):
-            return True
 
-    def update(self, delta_time):
-        """Move the alien ship to the right."""
-        self.x += ((self.settings.alien_speed * delta_time)
-                   * self.settings.fleet_direction)
-        self.rect.x = self.x
+        # Respawn the alien if it goes out of the screen
+        if self.direction == 0:
+            if self.rect.top > self.settings.screen_height:
+                self.spawn_aliens()
+        elif self.direction == 1:
+            if self.rect.bottom < -10:
+                self.spawn_aliens()
+        elif self.direction == 2:
+            if self.rect.left > self.settings.screen_width:
+                self.spawn_aliens()
+        elif self.direction == 3:
+            if self.rect.right < -10:
+                self.spawn_alies()
 
 class BossAlien(Sprite):
     """A class to manage the boss alien"""

@@ -6,7 +6,7 @@ from pathlib import Path
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
-from alien import Alien, BossAlien
+from alien import BossAlien, Alien
 from time import sleep
 from game_stats import GameStats
 from buttons import Button
@@ -42,13 +42,13 @@ class AlienInvasion:
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self.upgrades = pygame.sprite.Group()
-        self.fleet = FleetStructure(self)
         self.enemies_killed = 0
         self.upgrade_spawned = False
         self.bullet_type = 'bullet'
 
-        self._create_fleet()
-
+        self.last_alien_spawn_time = pygame.time.get_ticks()
+        self.alien_spawn_interval = self.settings.alien_spawn_interval
+        
         self.play_button = Button(self, "PLAY")
         self._make_difficulty_buttons()
 
@@ -127,25 +127,29 @@ class AlienInvasion:
         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
             self.ship.movement.moving_down = False
 
-    def _create_fleet(self):
-        """Create the fleet of alien ships."""
-        alien_type = self.stats.level % 3 + 1
-        self.aliens.empty()  # Clear existing aliens before creating the new fleet.
+    def _spawn_alien(self):
+        """Spawn a single alien at a random location."""
+        alien_type = self.stats.level % 3 + 1 
+        x_position = random.randint(0, self.settings.screen_width - 50)  # Keep aliens on-screen
+        y_position = random.randint(-100, -40)  # Spawn just above the screen
 
-        self.fleet.create_fleet(alien_type)
+        new_alien = Alien(self, alien_type)
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        self.aliens.add(new_alien)
 
-    def _check_fleet_edges(self, delta_time):
-        """If any alien ship hits the edge, change behavior."""
-        for alien in self.aliens.sprites():
-            if alien.check_edges():
-                self._change_fleet_direction(delta_time)
-                break
+    # def _check_fleet_edges(self, delta_time):
+    #     """If any alien ship hits the edge, change behavior."""
+    #     for alien in self.aliens.sprites():
+    #         if alien.check_edges():
+    #             self._change_fleet_direction(delta_time)
+    #             break
         
-    def _change_fleet_direction(self, delta_time):
-        """Drop the entire fleet and change the fleet's direction."""
-        for alien in self.aliens.sprites():
-            alien.rect.y += self.settings.fleet_drop_speed * delta_time
-        self.settings.fleet_direction *= -1
+    # def _change_fleet_direction(self, delta_time):
+    #     """Drop the entire fleet and change the fleet's direction."""
+    #     for alien in self.aliens.sprites():
+    #         alien.rect.y += self.settings.fleet_drop_speed * delta_time
+    #     self.settings.fleet_direction *= -1
 
     def _update_screen(self):
         """Update the images on the screen, and flip to the new screen"""
@@ -202,6 +206,12 @@ class AlienInvasion:
         
     def _check_bullet_alien_collision(self):
         """Respond to bullet-alien collisions."""
+        self._handle_collisions()
+        self._check_if_level_finished()
+        self._check_if_boss_fight_should_start()
+
+    def _handle_collisions(self):
+        """Handle collisions between bullets and aliens."""
         # If bullets hit the alien do collision
         collision = pygame.sprite.groupcollide(
                 self.bullets, self.aliens, False, True # True means it will remove the sprite from the group
@@ -214,42 +224,59 @@ class AlienInvasion:
             self.score.prep_score()
             self.score.check_high_score()
             self.enemies_killed += len(aliens)
-            if self.enemies_killed >= 2 and not self.upgrade_spawned:
+            if self.enemies_killed >= 25 and not self.upgrade_spawned:
                 self._create_upgrade() 
                 self.enemies_killed = 0
 
-        # If no more aliens, recreate the fleet
+    def _check_if_level_finished(self):
+        """Check if all aliens have been destroyed."""
         if not self.aliens:
             self.bullets.empty()
             self.stats.level += 1
-            if self.stats.level % 5 == 0:  # Example condition for boss level
-                self._start_boss_fight()
-            else:
-                self._create_fleet()
-                self.settings.increase_speed()
+            # self._create_fleet()
+            self.settings.increase_speed()
+
+        # Reduce spawn interval to increase difficulty
+        self.alien_spawn_interval = max(500, self.alien_spawn_interval - 200)  # Minimum of 500 ms
+
+    def _check_if_boss_fight_should_start(self):
+        """Check if it is time for a boss fight to start."""
+        if self.stats.level % 5 == 0 and self.stats.level != 0:
+            self._start_boss_fight()
 
 
     def _create_upgrade(self):
         """Create an upgrade at a random location."""
-        upgrade_type = random.choice(['missile','laser'])  
+        upgrade_type = random.choice(['missile','laser','shooting_speed', 'ship_speed', 'ship_shield'])  
         location = (random.randint(0, self.settings.screen_width), 
                     random.randint(0, self.settings.screen_height))
         upgrade = Upgrade(upgrade_type, location, self.image_retrieve)
         self.upgrades.add(upgrade)
+        self.upgrade_spawned = True
         print(f"Created upgrade: {upgrade_type} at {location}")
 
-
     def _update_aliens(self, delta_time):
-        """Update the alien fleet position."""
-        self._check_fleet_edges(delta_time)
+        """Update the alien positions and spawn new aliens."""
+        current_time = pygame.time.get_ticks()
+
+        # Spawn a new alien at regular intervals
+        if current_time - self.last_alien_spawn_time > self.alien_spawn_interval:
+            self._spawn_alien()
+            self.last_alien_spawn_time = current_time
+
+        # Update existing aliens
         self.aliens.update(delta_time)
 
-        # If the alien ship collides with our ship, or goes below the edges lose game
-        if pygame.sprite.spritecollide(self.ship, self.aliens, False):
-            self._ship_hit()
+        # Check for collisions
+        self._check_alien_collision()
         
-        self._check_aliens_bottom()
-        self._check_upgrade_collision()
+    def _check_alien_collision(self): 
+        """Check alien ship collisions with our ship."""
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            self._ship_hit()
+
+        # collisions = pygame.sprite.groupcollide(self.aliens, self.bullets, True, True)
+
         
     def _check_upgrade_collision(self):
         """Check for collisions between the ship and upgrades."""
@@ -277,20 +304,12 @@ class AlienInvasion:
                 self.aliens.empty()
 
                 # Create a new fleet and center the ship
-                self._create_fleet()
+                # self._create_fleet()
                 self.ship.center_ship()
                 sleep(0.5)
             else:
                 self.game_active = False
                 pygame.mouse.set_visible(True)
-
-    def _check_aliens_bottom(self):
-        """Check if any aliens have reached the bottom of the screen."""
-        for alien in self.aliens.sprites():
-            if alien.rect.bottom >= self.settings.screen_height:
-                # Treat this same as if the ship got hit
-                self._ship_hit()
-                break
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
@@ -355,7 +374,7 @@ class AlienInvasion:
         self.bullets.empty()
         self.aliens.empty()
 
-        self._create_fleet()
+        # self._create_fleet()
         self.ship.center_ship()
 
         pygame.mouse.set_visible(False)
