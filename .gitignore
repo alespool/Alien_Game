@@ -1,2 +1,5 @@
 alien/
 __pycache__/
+*.wav
+*.zip
+*.mp3

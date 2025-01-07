@@ -19,8 +19,6 @@ class Upgrade(Sprite):
             ship.settings.shield_strength += 1
         elif self.upgrade_type == 'extra_life':
             ship.stats.lives += 1
-        elif self.upgrade_type == 'missile':
-            ship.settings.missile = True
 
     def reset_upgrades(self, ship):
         """Reset the upgrades to the default settings."""

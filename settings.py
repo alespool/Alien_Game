@@ -8,8 +8,8 @@ class Settings:
         """Initialize the game's settings"""
         
         # Screen settings
-        self.screen_width = 1200
-        self.screen_height = 800
+        self.screen_width = 1920
+        self.screen_height = 1080
         
         self.bg_color = (0,0,0)
 
@@ -22,7 +22,8 @@ class Settings:
         self.shield_strength = 0  # Default shield strength
 
         # Alien settings 
-        self.fleet_drop_speed = 10
+        self.max_aliens = 5
+        self.alien_spawn_interval = 10000
 
         # Game speeds up
         self.speedup_scale = 1.1
@@ -31,7 +32,7 @@ class Settings:
         self.score_scale = 1.5
 
         # Set initial difficulty
-        self.difficulty_level = 'Medium'
+        self.difficulty_level = 'Easy'
         self.initialize_dynamic_settings()
 
     def initialize_dynamic_settings(self):
@@ -58,7 +59,7 @@ class Settings:
             self.alien_points = 25
         elif self.difficulty_level == "Medium":
             self.ship_speed = 80.0
-            self.bullet_speed = 20.0
+            self.bullet_speed = 65.0
             self.alien_speed = 25.0
             self.alien_points = 50
         elif self.difficulty_level == "Hard":
