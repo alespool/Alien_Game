@@ -36,9 +36,9 @@ class Alien(Sprite):
         self.rect.x += self.x_speed * delta_time
         self.rect.y += self.y_speed * delta_time       
         
-        dir_x, dir_y = self.ai_game.ship.movement.x - self.rect.x, self.ai_game.ship.movement.y - self.rect.y
-        self.rotation = (180 / math.pi) * -math.atan2(-dir_x, -dir_y)
-        self.image = pygame.transform.rotate(self.image, self.rotation)
+        # dir_x, dir_y = self.ai_game.ship.movement.x - self.rect.x, self.ai_game.ship.movement.y - self.rect.y
+        # self.rotation = (180 / math.pi) * -math.atan2(-dir_x, -dir_y)
+        # self.image = pygame.transform.rotate(self.image, self.rotation)
 
         # self.check_edges()
 
