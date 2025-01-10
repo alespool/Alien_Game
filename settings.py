@@ -47,6 +47,7 @@ class Settings:
         self.ship_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
+        self.alien_bullet_speed *= self.speedup_scale
 
         self.alien_points = int(self.alien_points * self.score_scale)
 
@@ -57,13 +58,17 @@ class Settings:
             self.bullet_speed = 75.0
             self.alien_speed = 35.0
             self.alien_points = 25
+            self.alien_bullet_speed = 15
         elif self.difficulty_level == "Medium":
             self.ship_speed = 80.0
             self.bullet_speed = 65.0
             self.alien_speed = 25.0
             self.alien_points = 50
+            self.alien_bullet_speed = 25
         elif self.difficulty_level == "Hard":
             self.ship_speed = 15.0
             self.bullet_speed = 15.0
             self.alien_speed = 35.0
             self.alien_points = 75
+            self.alien_bullet_speed = 35
+

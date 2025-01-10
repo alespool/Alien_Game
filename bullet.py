@@ -14,16 +14,12 @@ class Bullet(Sprite):
         self.image = Images()
         self.image_retrieve = self.image.bullets[bullet_type]
         
-        # Set starting position from ship
         self.rect = self.image_retrieve.get_rect(center=ai_game.ship.rect.center)
         
-        # Calculate direction vector and normalize it
         self._calc_direction(mouse_x, mouse_y)
         
-        # Rotate the bullet surface
         self._rotate_bullet()
         
-        # Store the bullet speed
         self.speed = self.settings.bullet_speed
         self.delta_time = 0
 
@@ -49,3 +45,23 @@ class Bullet(Sprite):
     def draw_bullet(self):
         """Draw the bullet to the screen"""
         self.screen.blit(self.image_retrieve, self.rect)
+
+class AlienBullet(Sprite):
+    """A class for bullets shot by the aliens."""
+
+    def __init__(self, alien, ai_game):
+        super().__init__()
+        self.screen = ai_game.screen
+        self.settings = ai_game.settings
+        self.image_retrieve = Images()
+        self.image = self.image_retrieve.bullets['alien_bullet']
+        self.rect = self.image.get_rect(center=alien.rect.center)
+        self.speed = self.settings.alien_bullet_speed
+
+    def update(self, delta_time):
+        """Move the bullet down the screen."""
+        self.rect.y += self.speed * delta_time
+
+    def draw_bullet(self):
+        """Draw the alien bullet to the screen."""
+        self.screen.blit(self.image, self.rect)

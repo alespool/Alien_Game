@@ -5,7 +5,7 @@ import random
 from pathlib import Path
 from settings import Settings
 from ship import Ship
-from bullet import Bullet
+from bullet import Bullet, AlienBullet
 from alien import BossAlien, Alien
 from time import sleep
 from game_stats import GameStats
@@ -40,6 +40,7 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.alien_bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self.upgrades = pygame.sprite.Group()
         self.enemies_killed = 0
@@ -163,6 +164,9 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
 
+        for alien_bullet in self.alien_bullets.sprites():
+            alien_bullet.draw_bullet()
+
         self.score.show_score()
 
         if not self.game_active:
@@ -192,11 +196,17 @@ class AlienInvasion:
     def _update_bullets(self, delta_time):
         """Update position of bullets and get rid of old bullets."""
         self.bullets.update(delta_time)
+        self.alien_bullets.update(delta_time)
 
         # Get rid of bullets outside windows
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+
+        # Get rid of alien bullets outside windows
+        for alien_bullet in self.alien_bullets.copy():
+            if alien_bullet.rect.top >= self.settings.screen_height:
+                self.alien_bullets.remove(alien_bullet)
 
         self._check_bullet_alien_collision()
         
@@ -213,13 +223,17 @@ class AlienInvasion:
     def _handle_collisions(self):
         """Handle collisions between bullets and aliens."""
         # If bullets hit the alien do collision
-        collision = pygame.sprite.groupcollide(
+        player_bullets_collision = pygame.sprite.groupcollide(
                 self.bullets, self.aliens, False, True # True means it will remove the sprite from the group
-        )
+            )
 
-        if collision:
+        alien_player_collision = pygame.sprite.spritecollide(
+            self.ship, self.alien_bullets, True, False
+            )
+
+        if player_bullets_collision or alien_player_collision:
             self._play_noise('damageSound')
-            for aliens in collision.values():
+            for aliens in player_bullets_collision.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.score.prep_score()
             self.score.check_high_score()
@@ -267,8 +281,17 @@ class AlienInvasion:
         # Update existing aliens
         self.aliens.update(delta_time)
 
+        self._alien_shoot()
+
         # Check for collisions
         self._check_alien_collision()
+
+    def _alien_shoot(self):
+        """Handle the bullets shot by the alien ships."""
+        for alien in self.aliens:
+            if random.random() < 0.01:
+                new_bullet = AlienBullet(alien, self)
+                self.alien_bullets.add(new_bullet)
         
     def _check_alien_collision(self): 
         """Check alien ship collisions with our ship."""
