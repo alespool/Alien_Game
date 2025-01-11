@@ -1,6 +1,6 @@
 from pygame.sprite import Sprite
 
-class Upgrade(Sprite):
+class Drop(Sprite):
     def __init__(self, upgrade_type, location, image_retrieve):
         super().__init__()
         self.upgrade_type = upgrade_type

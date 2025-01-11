@@ -1,7 +1,7 @@
 import pygame
 import math
 
-class MovementSystem:
+class MovementComponent:
     """A physics-based movement system with acceleration, friction, and momentum"""
     
     def __init__(self, entity, settings):

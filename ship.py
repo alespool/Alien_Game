@@ -23,7 +23,7 @@ class Ship:
     def blitme(self):
         """Draw the ship at its current location"""
         self.screen.blit(self.image, self.rect)
-
+# TODO: se one update func
     def update_rotation(self):
         """Update the ship's rotation."""
         self.movement.update_rotation()

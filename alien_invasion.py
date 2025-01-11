@@ -102,6 +102,7 @@ class AlienInvasion:
             self._start_game()
 
         # Move the ship with the arrow keys or WASD
+        # TODO: Put in input mov class. Sound when bullet fires
         if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             self.ship.movement.moving_right = True
         elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
